@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catch the Ball Game</title>
+<style>
+  body { margin: 0; background: #111; overflow: hidden; user-select: none; }
+  canvas { display: block; margin: auto; background: #222; border: 2px solid #fff; }
+  .controls {
+    display: flex;
+    justify-content: space-around;
+    position: fixed;
+    bottom: 20px;
+    width: 100%;
+  }
+  button {
+    background: #09f;
+    color: white;
+    font-size: 20px;
+    border: none;
+    border-radius: 10px;
+    padding: 15px 30px;
+    box-shadow: 0 0 10px #09f;
+  }
+  button:active { background: #0cf; }
+</style>
+</head>
+<body>
+<canvas id="game" width="400" height="600"></canvas>
+
+<div class="controls">
+  <button id="leftBtn">⬅️ Left</button>
+  <button id="rightBtn">➡️ Right</button>
+</div>
+
+<script>
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+let basket = { x: 160, y: 550, w: 80, h: 20, speed: 5 };
+let ball = { x: Math.random()*380, y: 0, r: 10, speed: 3 };
+let score = 0;
+
+function draw() {
+  ctx.clearRect(0, 0, 400, 600);
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+  ctx.fillStyle = "#0f0";
+  ctx.fill();
+  ctx.fillStyle = "#09f";
+  ctx.fillRect(basket.x, basket.y, basket.w, basket.h);
+  ctx.fillStyle = "#fff";
+  ctx.font = "20px Arial";
+  ctx.fillText("Score: " + score, 10, 25);
+}
+
+function update() {
+  ball.y += ball.speed;
+  if (ball.y + ball.r >= basket.y && ball.x > basket.x && ball.x < basket.x + basket.w) {
+    score++;
+    ball.y = 0;
+    ball.x = Math.random() * 380;
+    ball.speed += 0.2;
+  }
+  if (ball.y > 600) {
+    alert("Game Over! Final Score: " + score);
+    document.location.reload();
+  }
+}
+
+function moveBasketLeft() { if (basket.x > 0) basket.x -= basket.speed * 5; }
+function moveBasketRight() { if (basket.x + basket.w < 400) basket.x += basket.speed * 5; }
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowLeft") moveBasketLeft();
+  if (e.key === "ArrowRight") moveBasketRight();
+});
+
+document.getElementById("leftBtn").addEventListener("touchstart", moveBasketLeft);
+document.getElementById("rightBtn").addEventListener("touchstart", moveBasketRight);
+
+function gameLoop() { draw(); update(); requestAnimationFrame(gameLoop); }
+gameLoop();
+</script>
+</body>
+</html>
